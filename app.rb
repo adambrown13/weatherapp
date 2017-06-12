@@ -38,30 +38,10 @@ class HangpersonApp < Sinatra::Base
   # Use existing methods in HangpersonGame to process a guess.
   # If a guess is repeated, set flash[:message] to "You have already used that letter."
   # If a guess is invalid, set flash[:message] to "Invalid guess."
-  post '/guess' do
+  post '/address' do
     #@game.currTempAPIPull = HangpersonGame.get_curr_temp
-    if !(params[:guess].length > 0)
-      flash[:message] = "Invalid guess."
-      redirect '/show'
-    end  
-    letter = params[:guess].to_s[0]
     address = params[:addr].to_s
     @game.update_curr(@game.get_address_lat(address), @game.get_address_long(address))
-    if (letter == '') || (letter =~ /\W/) || (letter =~ /\d/)
-      flash[:message] = "Invalid guess."
-    else
-      prelenwguess = @game.wrong_guesses.length
-      if @game.guess(letter)
-        postlenwguess = @game.wrong_guesses.length
-        if prelenwguess < postlenwguess || 
-          flash[:message] = "Invalid guess."
-        end
-        
-    
-      else
-        flash[:message] = "You have already used that letter."
-      end
-    end
     
     redirect '/show'
   end
@@ -84,13 +64,6 @@ class HangpersonApp < Sinatra::Base
     erb :show
   end
   
-  get '/win' do
-    if !(@game.check_win_or_lose == :win)
-       redirect '/show'
-    end
-    erb :win
-    
-  end
   
   get '/lose' do
     if !(@game.check_win_or_lose == :lose)

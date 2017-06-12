@@ -94,19 +94,6 @@ class HangpersonGame
     return true #I don't get why it's true if you guess incorrectly, but whatever, Shikata ga nai
   end
   
-  def word_with_guesses
-    outword = ''
-    chars = @word.split('')
-    for l in chars
-      if (@guesses.include? l)
-        outword << l
-      else
-        outword << '-'
-      end
-    end
-    return outword
-  end
-  
   def check_win_or_lose
     if @guesses == ''
       return :play
