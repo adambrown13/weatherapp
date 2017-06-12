@@ -9,14 +9,22 @@ class HangpersonGame
     @word = ''
     @guesses = ''
     @wrong_guesses = ''
+    @timeZoneCheck = ''
+    @currTemp = "-69"
+    
   end
   
   def initialize(word)
     @word = word
     @guesses = ''
     @wrong_guesses = ''
+    @currWeather = 'None'
+    @currTemp = "-69"
+    @currRain = '-69'
+    
   end
   
+
   def word
     @word
   end
@@ -35,6 +43,24 @@ class HangpersonGame
   
   def wrong_guesses
     @wrong_guesses
+  end
+  
+  def timeZoneCheck
+    @timeZoneCheck
+  end
+  
+  def currWeather
+    @currWeather
+    
+  end
+  
+  def currRain
+    @currRain
+    
+  end
+  
+  def currTemp
+    @currTemp
   end
   
   def wrong_guesses=(str)
@@ -85,7 +111,7 @@ class HangpersonGame
     if @guesses == ''
       return :play
     end
-    if @wrong_guesses.length == 7
+    if @wrong_guesses.length == 1
       return :lose
     end
     
@@ -102,6 +128,77 @@ class HangpersonGame
     require 'net/http'
     uri = URI('http://watchout4snakes.com/wo4snakes/Random/RandomWord')
     Net::HTTP.post_form(uri ,{}).body
+    
+    
+  end
+  
+  def update_curr(lat, long)
+    inLat = lat.to_s
+    inLong = long.to_s
+    require 'uri'
+    require 'net/http'
+    require 'json'
+    url = 'https://api.darksky.net/forecast/8c7f074863e3a66f8e8b76c2dfee5ba6/' + inLat + ',' + inLong
+    uri = URI(url)
+    response = Net::HTTP.get(uri)
+    @currWeather = JSON.parse(response)["currently"]["summary"]
+    @currTemp = JSON.parse(response)["currently"]["temperature"]
+    @currRain = JSON.parse(response)["currently"]["precipProbability"]
+    return currTemp
+
+    
+    
+  end
+  
+  def get_address_lat(address)
+    
+    splitAddr = address.split(' ')
+    
+    finAddr = ''
+    
+    for i in 0..splitAddr.length - 2
+      finAddr = finAddr + splitAddr[i] + '+'
+    end
+    
+    finAddr = finAddr + splitAddr[splitAddr.length-1]
+    
+    
+    require 'uri'
+    require 'net/http'
+    require 'json'
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + finAddr + '&key=AIzaSyCYTatJM3lH_zJwNcDXhfR3fGU7k-EHd-g'
+    uri = URI(url)
+    response = Net::HTTP.get(uri)
+    googleOutputJSON = JSON.parse(response)
+    addrLat = googleOutputJSON["results"][0]["geometry"]["location"]["lat"]
+    
+    return addrLat
+    
+  end
+  
+  def get_address_long(address)
+    
+    splitAddr = address.split(' ')
+    
+    finAddr = ''
+    
+    for i in 0..splitAddr.length - 2
+      finAddr = finAddr + splitAddr[i] + '+'
+    end
+    
+    finAddr = finAddr + splitAddr[splitAddr.length-1]
+    
+    
+    require 'uri'
+    require 'net/http'
+    require 'json'
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + finAddr + '&key=AIzaSyCYTatJM3lH_zJwNcDXhfR3fGU7k-EHd-g'
+    uri = URI(url)
+    response = Net::HTTP.get(uri)
+    googleOutputJSON = JSON.parse(response)
+    addrLong = googleOutputJSON["results"][0]["geometry"]["location"]["lng"]
+    return addrLong
   end
 
 end
+

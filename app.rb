@@ -8,6 +8,7 @@ class HangpersonApp < Sinatra::Base
   register Sinatra::Flash
   
   before do
+    #timeZoneCreate = HangpersonGame.get_curr_temp('42.3601','-71.0589')
     @game = session[:game] || HangpersonGame.new('')
   end
   
@@ -28,8 +29,8 @@ class HangpersonApp < Sinatra::Base
   post '/create' do
     # NOTE: don't change next line - it's needed by autograder!
     word = params[:word] || HangpersonGame.get_random_word
+    #timeZoneCreate = HangpersonGame.get_curr_temp('42.3601','-71.0589')
     # NOTE: don't change previous line - it's needed by autograder!
-
     @game = HangpersonGame.new(word)
     redirect '/show'
   end
@@ -38,11 +39,14 @@ class HangpersonApp < Sinatra::Base
   # If a guess is repeated, set flash[:message] to "You have already used that letter."
   # If a guess is invalid, set flash[:message] to "Invalid guess."
   post '/guess' do
+    #@game.currTempAPIPull = HangpersonGame.get_curr_temp
     if !(params[:guess].length > 0)
       flash[:message] = "Invalid guess."
       redirect '/show'
     end  
     letter = params[:guess].to_s[0]
+    address = params[:addr].to_s
+    @game.update_curr(@game.get_address_lat(address), @game.get_address_long(address))
     if (letter == '') || (letter =~ /\W/) || (letter =~ /\d/)
       flash[:message] = "Invalid guess."
     else
@@ -72,8 +76,6 @@ class HangpersonApp < Sinatra::Base
     outcome = @game.check_win_or_lose
     if outcome == :win
       redirect '/win'
-    elsif outcome == :lose
-      redirect '/lose'
     else
       if outcome == :play
         erb :show

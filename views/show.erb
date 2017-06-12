@@ -16,9 +16,28 @@
   <span class="word"><%= @game.word_with_guesses %></span>
 </p>
 
+<p>
+ Current Weather:
+  <span class="weather"><%= @game.currWeather %></span>
+</p>
+
+<p>
+ Temperature at Location:
+  <span class="temp"><%= @game.currTemp %></span>
+</p>
+
+<p>
+ Chance of Rain:
+  <span class="rainChance"><%= @game.currRain %></span>
+  %
+</p>
+
+
 <form action="/guess" method="post">
   <input type="text" size="1" name="guess" autocomplete="off"/>
   <input type="submit" value="Guess!"/>
+  <input type="text" size="10" name="addr" autocomplete="off"/>
+  Address
 </form>
 
 <%= erb :new %>
