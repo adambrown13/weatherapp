@@ -8,16 +8,13 @@ class HangpersonApp < Sinatra::Base
   register Sinatra::Flash
   
   before do
-    #timeZoneCreate = HangpersonGame.get_curr_temp('42.3601','-71.0589')
-    @game = session[:game] || HangpersonGame.new('')
+    @game = session[:game] || HangpersonGame.new()
   end
   
   after do
     session[:game] = @game
   end
   
-  # These two routes are good examples of Sinatra syntax
-  # to help you with the rest of the assignment
   get '/' do
     redirect '/new'
   end
@@ -27,50 +24,37 @@ class HangpersonApp < Sinatra::Base
   end
   
   post '/create' do
-    # NOTE: don't change next line - it's needed by autograder!
-    word = params[:word] || HangpersonGame.get_random_word
-    #timeZoneCreate = HangpersonGame.get_curr_temp('42.3601','-71.0589')
-    # NOTE: don't change previous line - it's needed by autograder!
-    @game = HangpersonGame.new(word)
+    @game = HangpersonGame.new()
     redirect '/show'
   end
   
-  # Use existing methods in HangpersonGame to process a guess.
-  # If a guess is repeated, set flash[:message] to "You have already used that letter."
-  # If a guess is invalid, set flash[:message] to "Invalid guess."
   post '/address' do
+    
+    if params[:addr].length == 0
+      redirect '/new'
+    end
+    
     #@game.currTempAPIPull = HangpersonGame.get_curr_temp
     address = params[:addr].to_s
-    @game.update_curr(@game.get_address_lat(address), @game.get_address_long(address))
+    
+    if @game.get_address(address)["results"].length == 0
+      
+      flash[:message] = "Address Not Found"
+      redirect '/new'
+    
+    end
+    
+    @game.update_curr(address)#@game.get_address_lat(address), @game.get_address_long(address))
     
     redirect '/show'
   end
-  
-  # Everytime a guess is made, we should eventually end up at this route.
-  # Use existing methods in HangpersonGame to check if player has
-  # won, lost, or neither, and take the appropriate action.
-  # Notice that the show.erb template expects to use the instance variables
-  # wrong_guesses and word_with_guesses from @game.
+
   get '/show' do
-    
-    outcome = @game.check_win_or_lose
-    if outcome == :win
-      redirect '/win'
-    else
-      if outcome == :play
-        erb :show
-      end
-    end
     erb :show
   end
   
-  
   get '/lose' do
-    if !(@game.check_win_or_lose == :lose)
-      redirect '/show'
-    end
     erb :lose
-    
   end
   
 end

@@ -1,4 +1,10 @@
-<!-- This form is incomplete--it needs a destination URL as well as a method: -->
-<form action="/create" method="post">
-  <input type="submit" value="New Game"/>
+<% if flash[:message] %>
+  <p>
+    <span class="error"><%= flash[:message] %></span>
+  </p>
+<% end %>
+
+<form action="/address" method="post">
+  <input type="text" size="40" name="addr" autocomplete="off"/>
+  <input type="submit" value="Address"/>
 </form>

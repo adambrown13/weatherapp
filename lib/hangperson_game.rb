@@ -1,49 +1,16 @@
 class HangpersonGame
 
-  # add the necessary class methods, attributes, etc. here
-  # to make the tests in spec/hangperson_game_spec.rb pass.
-
-  # Get a word from remote "random word" service
-
+  
+  
   def initialize()
-    @word = ''
-    @guesses = ''
-    @wrong_guesses = ''
-    @timeZoneCheck = ''
-    @currTemp = "-69"
-    
-  end
-  
-  def initialize(word)
-    @word = word
-    @guesses = ''
-    @wrong_guesses = ''
     @currWeather = 'None'
-    @currTemp = "-69"
-    @currRain = '-69'
+    @currTemp = "-88"
+    @currRain = '-88'
+    @currLoc = ''
+    @previous = []
     
   end
   
-
-  def word
-    @word
-  end
-  
-  def word=(str)
-    @word = str
-  end
-
-  def guesses
-    @guesses
-  end
-
-  def guesses=(str)
-    @guesses = str
-  end
-  
-  def wrong_guesses
-    @wrong_guesses
-  end
   
   def timeZoneCheck
     @timeZoneCheck
@@ -63,81 +30,35 @@ class HangpersonGame
     @currTemp
   end
   
-  def wrong_guesses=(str)
-    @wrong_guesses = str
+  def currLoc
+    @currLoc
   end
+    
   
-  def guess(g)
-    if (g == nil) || (g == '') || (g =~ /\W/) 
-      raise ArgumentError
-    end
-    if @wrong_guesses =~ /#{g}/i
-      return false
-    else
-      if (@word =~ /#{g}/i)
-        
-        if !(@guesses =~ /#{g}/i)
-          
-          @guesses << g
-          #put @guesses
-          return true
-        end
-        return false
-        
-      else
-        
-        @wrong_guesses << g
-        #put @wrong_guesses
-        
-      end
-    end
-    return true #I don't get why it's true if you guess incorrectly, but whatever, Shikata ga nai
-  end
-  
-  def check_win_or_lose
-    if @guesses == ''
-      return :play
-    end
-    if @wrong_guesses.length == 1
-      return :lose
-    end
-    
-    if !(@word =~ /[^#{@guesses}]/)
-      return :win
-    end
-    
-    return :play
-  end
-    
-
-  def self.get_random_word
-    require 'uri'
-    require 'net/http'
-    uri = URI('http://watchout4snakes.com/wo4snakes/Random/RandomWord')
-    Net::HTTP.post_form(uri ,{}).body
-    
-    
-  end
-  
-  def update_curr(lat, long)
-    inLat = lat.to_s
-    inLong = long.to_s
+  def update_curr(address)
+    quickPack = [@currLoc, @currWeather, @currTemp, @currRain]
+    @previous = @previous + quickPack
+    googleJSON = get_address(address)
+    inLat = googleJSON["results"][0]["geometry"]["location"]["lat"].to_s
+    inLong = googleJSON["results"][0]["geometry"]["location"]["lng"].to_s
     require 'uri'
     require 'net/http'
     require 'json'
     url = 'https://api.darksky.net/forecast/8c7f074863e3a66f8e8b76c2dfee5ba6/' + inLat + ',' + inLong
     uri = URI(url)
     response = Net::HTTP.get(uri)
-    @currWeather = JSON.parse(response)["currently"]["summary"]
-    @currTemp = JSON.parse(response)["currently"]["temperature"]
-    @currRain = JSON.parse(response)["currently"]["precipProbability"]
+    darkSkyJSON = JSON.parse(response)
+    @currWeather = darkSkyJSON["currently"]["summary"]
+    @currTemp = darkSkyJSON["currently"]["temperature"]
+    @currRain = darkSkyJSON["currently"]["precipProbability"]
+    @currLoc = googleJSON["results"][0]["formatted_address"]
     return currTemp
 
     
     
   end
   
-  def get_address_lat(address)
+  def get_address(address)
     
     splitAddr = address.split(' ')
     
@@ -157,35 +78,10 @@ class HangpersonGame
     uri = URI(url)
     response = Net::HTTP.get(uri)
     googleOutputJSON = JSON.parse(response)
-    addrLat = googleOutputJSON["results"][0]["geometry"]["location"]["lat"]
-    
-    return addrLat
+    return googleOutputJSON
     
   end
   
-  def get_address_long(address)
-    
-    splitAddr = address.split(' ')
-    
-    finAddr = ''
-    
-    for i in 0..splitAddr.length - 2
-      finAddr = finAddr + splitAddr[i] + '+'
-    end
-    
-    finAddr = finAddr + splitAddr[splitAddr.length-1]
-    
-    
-    require 'uri'
-    require 'net/http'
-    require 'json'
-    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + finAddr + '&key=AIzaSyCYTatJM3lH_zJwNcDXhfR3fGU7k-EHd-g'
-    uri = URI(url)
-    response = Net::HTTP.get(uri)
-    googleOutputJSON = JSON.parse(response)
-    addrLong = googleOutputJSON["results"][0]["geometry"]["location"]["lng"]
-    return addrLong
-  end
 
 end
 
