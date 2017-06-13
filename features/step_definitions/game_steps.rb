@@ -9,47 +9,20 @@ module WithinHelpers
 end
 World(WithinHelpers)
 
-When /^I start a new game with word "(.*)"$/ do |word|
-  stub_request(:post, "http://watchout4snakes.com/wo4snakes/Random/RandomWord").
-    to_return(:status => 200, :headers => {}, :body => word)
+When /^I start a new at this locations "(.*)"$/ do |location|
+  stub_request(:post, "https://api.darksky.net/forecast/8c7f074863e3a66f8e8b76c2dfee5ba6/42.3601,-71.0589").
+    to_return(:status => 200, :headers => {}, :body => {"currently":{"time":1497249854,"summary":"Clear","precipProbability":0,"temperature":71.83}})
   visit '/new'
-  click_button "New Game"
+  click_button "Address"
 end
 
-When /^I guess "(.*)"(?: again)?$/ do |letter|
-  letter.downcase!
-  fill_in("guess", :with => letter)
-  click_button("Guess!")
+When /^I enter "(.*)"(?: again)?$/ do |letter|
+  fill_in("addr", :with => letter)
+  click_button("Address")
 end
 
-When /^I make the following guesses:(.*)$/ do |guesses|
-  guesses = guesses.gsub(' ', '').split(',')
-  guesses.each do |letter|
-    fill_in("guess", :with => letter)
-    click_button("Guess!")
-  end
-end
 
-Then /^the word should read "(.*)"$/ do |word|
-  page.should have_content(word)
-end
 
-Then /^the wrong guesses should include:(.*)$/ do |guesses|
-  guesses = guesses.gsub(' ', '').split(',')
-  guesses.each do |guess|
-    with_scope("span.guesses") do
-      page.should have_content(guess)
-    end
-  end
-end
-
-When /^I guess "(.*)" (.*) times in a row$/ do |letter, num|
-  letter.downcase!
-  num.to_i.times do
-    fill_in("guess", :with => letter)
-    click_button("Guess!")
-  end
-end
 
 When /^I try to go to the URL "(.*)"$/ do |url|
   visit url

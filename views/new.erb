@@ -8,3 +8,14 @@
   <input type="text" size="40" name="addr" autocomplete="off"/>
   <input type="submit" value="Address"/>
 </form>
+
+
+Previous Searches<br>
+<% @game.previous.each do |previousP| %>
+  Place : 
+  <%= previousP[0] %>
+  :    Last Temperature :  
+  <%= previousP[2] %>
+  :
+  <br>
+<% end %>

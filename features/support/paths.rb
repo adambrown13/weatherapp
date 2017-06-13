@@ -13,12 +13,11 @@ module NavigationHelpers
     when /the home\s?page/
       '/'
 
-    when /the winning page/
-      '/win'
-    when /the losing page/
-      '/lose'
     when /the show page/
       '/show'
+      
+    when /the new page/
+      '/new'
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

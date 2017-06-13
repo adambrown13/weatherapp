@@ -4,11 +4,11 @@ class HangpersonGame
   
   def initialize()
     @currWeather = 'None'
-    @currTemp = "-88"
-    @currRain = '-88'
+    @currTemp = ''
+    @currRain = ''
     @currLoc = ''
     @previous = []
-    
+    @previousPlace = []
   end
   
   
@@ -33,11 +33,25 @@ class HangpersonGame
   def currLoc
     @currLoc
   end
+  
+  def previous
+    @previous
+  end
+  
+  def previousPlace
+    @previousPlace
+  end
     
   
   def update_curr(address)
-    quickPack = [@currLoc, @currWeather, @currTemp, @currRain]
-    @previous = @previous + quickPack
+    if @currWeather != 'None' 
+      
+      quickPack = [@currLoc, @currWeather, @currTemp, @currRain]
+      @previous.push(quickPack)
+      @previousPlace.push(@currLoc)  
+      
+    end
+    
     googleJSON = get_address(address)
     inLat = googleJSON["results"][0]["geometry"]["location"]["lat"].to_s
     inLong = googleJSON["results"][0]["geometry"]["location"]["lng"].to_s
@@ -54,9 +68,8 @@ class HangpersonGame
     @currLoc = googleJSON["results"][0]["formatted_address"]
     return currTemp
 
-    
-    
   end
+  
   
   def get_address(address)
     
